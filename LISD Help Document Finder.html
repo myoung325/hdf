@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>LISD Help Document Finder</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    #results a { display: block; margin-bottom: 10px; }
+    #results span { font-size: 0.9em; color: gray; }
+  </style>
+</head>
+<body>
+
+<!--div><img src="dlogo.png"><h2>LISD Help Document Finder</h2></div-->
+
+<div style="display: flex; align-items: center;">
+  <img src="dlogo.png" alt="DeFo logo" style="height: 64px; margin-right: 10px;">
+  <h1>LISD Help Document Finder</h1>
+</div>
+
+<a href="https://www.deforest.k12.wi.us/district/learning-information-systems.cfm">LISD Home Page</a> ｜ 
+<a href="https://lisd.deforestschools.org/">Tech Request System</a> ｜ 
+Help Desk: <strong>608-842-6535</strong>
+
+<h3>What do you need help with?</h3>
+<input type="text" id="searchBox" placeholder="Start typing..." autocomplete="off" style="width: 500px; padding: 8px;">
+<p>
+<div id="results"></div>
+
+<script>
+  let helpData = [];
+
+  // Load the JSON data
+  fetch('help_data.json')
+    .then(response => response.json())
+    .then(data => helpData = data);
+
+  document.getElementById('searchBox').addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+    const queryWords = query.split(/\s+/);
+
+    if (!query) {
+      document.getElementById('results').innerHTML = '';
+      return;
+    }
+
+    const results = helpData.map(entry => {
+      let hits = 0;
+      queryWords.forEach(q => {
+        if (entry.keywords.some(k => k.toLowerCase().includes(q))) {
+          hits++;
+        }
+      });
+      return { ...entry, hits };
+    })
+    .filter(entry => entry.hits > 0)
+    .sort((a, b) => b.hits - a.hits)
+    .slice(0, 10);
+
+    const resultHtml = results.map(r =>
+      `<a href="${r.url}" target="_blank">${r.title}<br><span>${r.keywords.join(', ')}</span></a><p>`
+    ).join('');
+
+    document.getElementById('results').innerHTML = resultHtml || '<p>No results found.</p>';
+  });
+</script>
+
+</body>
+</html>
