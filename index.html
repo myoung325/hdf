@@ -44,6 +44,8 @@ Help Desk: <strong>608-842-6535</strong>
       return;
     }
 
+    // removing this equal weighting of search keywords...
+    /*
     const results = helpData.map(entry => {
       let hits = 0;
       queryWords.forEach(q => {
@@ -56,7 +58,23 @@ Help Desk: <strong>608-842-6535</strong>
     .filter(entry => entry.hits > 0)
     .sort((a, b) => b.hits - a.hits)
     .slice(0, 10);
+    */
 
+    // ...and replacing it with this code snippet that weights search keyword #1 at weight 3, search keyword #2 at weight 2, and search keywords #3+ at weight 1
+    const results = helpData.map(entry => {
+      let hits = 0;
+      queryWords.forEach((q, index) => {
+        const weight = Math.max(3 - index, 1); // first word = 3, second = 2, rest = 1
+        if (entry.keywords.some(k => k.toLowerCase().includes(q))) {
+          hits += weight;
+        }
+      });
+      return { ...entry, hits };
+    })
+    .filter(entry => entry.hits > 0)
+    .sort((a, b) => b.hits - a.hits)
+    .slice(0, 10);
+    
     const resultHtml = results.map(r =>
       `<a href="${r.url}" target="_blank">${r.title}<br><span>${r.keywords.join(', ')}</span></a><p>`
     ).join('');
