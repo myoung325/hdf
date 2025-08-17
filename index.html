@@ -1,74 +1,166 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>LISD Help Document Finder</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    #results a { display: block; margin-bottom: 10px; }
-    #results span { font-size: 0.9em; color: gray; }
-  </style>
+<meta charset="UTF-8" />
+<title>LISD Help Document Finder</title>
+<style>
+html, body {
+  font-family: Arial, sans-serif;
+  height: 100%;
+  margin: 0;
+  background-color: #f0f0f0; /* light gray */
+}
+
+/* Main container styling */
+#container {
+  min-height: 100vh;          /* full viewport height */
+  background-color: #fff;     /* white background */
+  padding: 20px 30px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 6px;
+  max-width: 700px;
+  margin: 0 auto;
+  box-sizing: border-box;     /* include padding in width/height */
+}
+
+/* Header: logo and title */
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: center;   /* center horizontally */
+  margin-bottom: 1rem;
+}
+
+#header img {
+  height: 64px;
+  margin-right: 10px;
+}
+
+/* Links line */
+#links {
+  max-width: 600px;           /* same width as searchBox */
+  margin: 0 auto 1rem auto;   /* auto left/right, 1rem bottom */
+  text-align: center;         /* center all links & text */
+  display: block;
+}
+
+#links a {
+  text-decoration: none;
+  color: #0077cc;
+  margin: 0 5px;
+}
+
+#links strong {
+  color: #333;
+}
+
+/* Main content area */
+#mainContent {
+  max-width: 600px;           /* same width as links & searchBox */
+  margin: 0 auto;
+  text-align: left;           /* keep left alignment */
+}
+
+/* Search prompt */
+#mainContent h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Search input box */
+#searchBox {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 20px;
+  font-size: 1rem;
+  box-sizing: border-box;
+  display: block;
+}
+
+/* Search results */
+#results > div {
+  margin-bottom: 20px;
+}
+
+#results a {
+  display: inline;
+  text-decoration: underline;
+  margin-bottom: 0;
+  color: #0077cc;
+}
+
+#results span {
+  font-size: 0.65em;
+  color: gray;
+  display: block;
+  margin-top: 2px;
+  margin-bottom: 0;
+}
+</style>
 </head>
 <body>
 
-<div style="display: flex; align-items: center;">
-  <img src="dlogo.png" alt="DeFo logo" style="height: 64px; margin-right: 10px;">
-  <h1>LISD Help Document Finder</h1>
-</div>
+  <div id="container">
+    <div id="header">
+      <img src="dlogo.png" alt="DeFo logo" />
+      <h1>LISD Help Document Finder</h1>
+    </div>
 
-<a href="https://www.deforest.k12.wi.us/district/learning-information-systems.cfm" target="_blank">LISD Home Page</a> ｜ 
-<a href="https://lisd.deforestschools.org/" target="_blank">Tech Request System</a> ｜ 
-Help Desk: <strong>608-842-6535</strong>
+    <div id="links">
+      <a href="https://www.deforest.k12.wi.us/district/learning-information-systems.cfm" target="_blank" rel="noopener noreferrer">LISD Home Page</a>｜
+      <a href="https://lisd.deforestschools.org/" target="_blank" rel="noopener noreferrer">Tech Request System</a>｜
+      Help Desk: <strong>608-842-6535</strong>
+    </div>
 
-<h3>What do you need help with?</h3>
-<input type="text" id="searchBox" placeholder="Start typing..." autocomplete="off" style="width: 500px; padding: 8px;">
-<p>
-<div id="results"></div>
+    <div id="mainContent">
+      <h3>What do you need help with?</h3>
+      <input type="text" id="searchBox" placeholder="Start typing..." autocomplete="off" />
+      <div id="results"></div>
+    </div>
+  </div>
 
-<!-- Include Fuse.js locally -->
-<script src="fuse.min.js"></script>
+  <!-- Include Fuse.js locally -->
+  <script src="fuse.min.js"></script>
 
-<script>
-  let helpData = [];
-  let fuse = null;
+  <script>
+    let helpData = [];
+    let fuse = null;
 
-  // Load the JSON data
-  fetch('help_data.json')
-    .then(response => response.json())
-    .then(data => {
-      helpData = data;
+    fetch('help_data.json')
+      .then(response => response.json())
+      .then(data => {
+        helpData = data;
 
-      // Initialize Fuse with config
-      const options = {
-        keys: ['title', 'keywords'],
-        threshold: 0.4,        // Lower = stricter match
-        ignoreLocation: true,  // Don't penalize based on word position
-        includeScore: true     // Optional, but may help with debugging
-      };
+        const options = {
+          keys: ['title', 'keywords'],
+          threshold: 0.4,
+          ignoreLocation: true,
+          includeScore: true
+        };
 
-      fuse = new Fuse(helpData, options);
+        fuse = new Fuse(helpData, options);
+      });
+
+    document.getElementById('searchBox').addEventListener('input', function () {
+      const query = this.value.trim();
+
+      if (!query || !fuse) {
+        document.getElementById('results').innerHTML = '';
+        return;
+      }
+
+      const results = fuse.search(query).slice(0, 10);
+
+      const resultHtml = results.map(r =>
+        `<div>
+          <a href="${r.item.url}" target="_blank" rel="noopener noreferrer">${r.item.title}</a>
+          <br><span>${r.item.keywords.join(', ')}</span>
+         </div>`
+      ).join('');
+
+      document.getElementById('results').innerHTML = resultHtml || '<p>No results found.</p>';
     });
-
-  document.getElementById('searchBox').addEventListener('input', function () {
-    const query = this.value.trim();
-
-    // Exit if no search or data not ready
-    if (!query || !fuse) {
-      document.getElementById('results').innerHTML = '';
-      return;
-    }
-
-    // Run fuzzy search
-    const results = fuse.search(query).slice(0, 10); // Limit to 10 results
-
-    // Generate HTML
-    const resultHtml = results.map(r =>
-      `<div><a href="${r.item.url}" target="_blank">${r.item.title}<br><span>${r.item.keywords.join(', ')}</span></a></div>`
-    ).join('');
-
-    document.getElementById('results').innerHTML = resultHtml || '<p>No results found.</p>';
-  });
-</script>
+  </script>
 
 </body>
 </html>
