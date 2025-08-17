@@ -11,8 +11,6 @@
 </head>
 <body>
 
-<!--div><img src="dlogo.png"><h2>LISD Help Document Finder</h2></div-->
-
 <div style="display: flex; align-items: center;">
   <img src="dlogo.png" alt="DeFo logo" style="height: 64px; margin-right: 10px;">
   <h1>LISD Help Document Finder</h1>
@@ -27,56 +25,45 @@ Help Desk: <strong>608-842-6535</strong>
 <p>
 <div id="results"></div>
 
+<!-- Include Fuse.js locally -->
+<script src="fuse.min.js"></script>
+
 <script>
   let helpData = [];
+  let fuse = null;
 
   // Load the JSON data
   fetch('help_data.json')
     .then(response => response.json())
-    .then(data => helpData = data);
+    .then(data => {
+      helpData = data;
+
+      // Initialize Fuse with config
+      const options = {
+        keys: ['title', 'keywords'],
+        threshold: 0.4,        // Lower = stricter match
+        ignoreLocation: true,  // Don't penalize based on word position
+        includeScore: true     // Optional, but may help with debugging
+      };
+
+      fuse = new Fuse(helpData, options);
+    });
 
   document.getElementById('searchBox').addEventListener('input', function () {
-    const query = this.value.toLowerCase().trim();
-    const queryWords = query.split(/\s+/);
+    const query = this.value.trim();
 
-    if (!query) {
+    // Exit if no search or data not ready
+    if (!query || !fuse) {
       document.getElementById('results').innerHTML = '';
       return;
     }
 
-    // removing this equal weighting of search keywords...
-    /*
-    const results = helpData.map(entry => {
-      let hits = 0;
-      queryWords.forEach(q => {
-        if (entry.keywords.some(k => k.toLowerCase().includes(q))) {
-          hits++;
-        }
-      });
-      return { ...entry, hits };
-    })
-    .filter(entry => entry.hits > 0)
-    .sort((a, b) => b.hits - a.hits)
-    .slice(0, 10);
-    */
+    // Run fuzzy search
+    const results = fuse.search(query).slice(0, 10); // Limit to 10 results
 
-    // ...and replacing it with this code snippet that weights search keyword #1 at weight 3, search keyword #2 at weight 2, and search keywords #3+ at weight 1
-    const results = helpData.map(entry => {
-      let hits = 0;
-      queryWords.forEach((q, index) => {
-        const weight = Math.max(3 - index, 1); // first word = 3, second = 2, rest = 1
-        if (entry.keywords.some(k => k.toLowerCase().includes(q))) {
-          hits += weight;
-        }
-      });
-      return { ...entry, hits };
-    })
-    .filter(entry => entry.hits > 0)
-    .sort((a, b) => b.hits - a.hits)
-    .slice(0, 10);
-    
+    // Generate HTML
     const resultHtml = results.map(r =>
-      `<a href="${r.url}" target="_blank">${r.title}<br><span>${r.keywords.join(', ')}</span></a><p>`
+      `<div><a href="${r.item.url}" target="_blank">${r.item.title}<br><span>${r.item.keywords.join(', ')}</span></a></div>`
     ).join('');
 
     document.getElementById('results').innerHTML = resultHtml || '<p>No results found.</p>';
