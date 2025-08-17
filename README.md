@@ -4,13 +4,15 @@ The tool takes keyword input from the user in real-time and dynamically searches
 
 🔍 **Search Logic**
 
-A recent enhancement includes keyword weighting for more refined searching:
+Recent enhancements includes keyword weighting for more refined searching:
 
 - The first keyword is weighted at value 3
 - The second at value 2
 - Any additional keywords are weighted at value 1
 
 This improves result relevance by prioritizing the terms users type first.
+
+Additionally, fuzzy searching was added with the assistance of fuse.js.
 
 🎯 **Purpose**
 
