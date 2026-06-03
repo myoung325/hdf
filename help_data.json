@@ -1,4 +1,10 @@
 [
+
+  {
+    "title": "Network Stability Test (internal only)",
+    "url": "https://myoung.deforestschools.org/netstab/",
+    "keywords": ["network", "test", "latency", "wireless", "Wi-Fi", "disconnecting"]
+  },
   
   {
     "title": "QR Code Generator PWA",
