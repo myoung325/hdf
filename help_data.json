@@ -1,6 +1,12 @@
 [
 
   {
+    "title": "Newline Resource Hub",
+    "url": "https://sites.google.com/deforestschools.org/newline-resource-hub/home",
+    "keywords": ["Newline", "interactive", "whiteboard", "panel", "touchscreen", "tutorial", "training"]
+  },
+  
+  {
     "title": "Network Stability Test (internal only)",
     "url": "https://myoung.deforestschools.org/netstab/",
     "keywords": ["network", "test", "latency", "wireless", "Wi-Fi", "disconnecting"]
