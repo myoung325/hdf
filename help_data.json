@@ -1,4 +1,10 @@
 [
+ 
+  {
+    "title": "Infinite Campus Community Link",
+    "url": "https://kb.infinitecampus.com/help",
+    "keywords": ["Infinite Campus", "IC", "sis", "Skyward Student"]
+  },
 
   {
     "title": "District Technology Connection Basics",
@@ -79,9 +85,9 @@
   },
 
   {
-    "title": "Classwize On Demand Learning",
+    "title": "On Demand Learning for Classroom Manager (formerly Classwize)",
     "url": "https://sites.google.com/linewize.com/learning-resources/classwize/on-demand-learning",
-    "keywords": ["LineWize", "ClassWize", "linewise", "classwise", "learning", "resource", "resources", "classroom management"]
+    "keywords": ["Classroom Manager", "LineWize", "ClassWize", "linewise", "classwise", "learning", "resource", "resources", "classroom management"]
   },
 
   {
